@@ -1,0 +1,41 @@
+spring:
+  docker:
+    compose:
+      enabled: false
+
+  datasource:
+    url: jdbc:h2:mem:songforge;MODE=PostgreSQL;DB_CLOSE_DELAY=-1;DB_CLOSE_ON_EXIT=FALSE
+    driver-class-name: org.h2.Driver
+    username: sa
+    password:
+  jpa:
+    hibernate:
+      ddl-auto: update
+    properties:
+      hibernate.dialect: org.hibernate.dialect.H2Dialect
+
+# your storage service likely binds to this:
+storage:
+  baseDir: "D:/songforge-storage"
+
+app:
+  ffmpeg:
+    # use the full path that `Get-Command ffmpeg` shows on your machine:
+    path: 'C:/ProgramData/chocolatey/bin/ffmpeg.exe'
+    size: "1280x720"
+    fps: 30
+    timeoutSecs: 60
+  stableaudio:
+    # Default public base; keep configurable in case of version changes
+    apiBase: "https://api.stability.ai"
+    # Read from env var to avoid committing secrets
+    apiKey: "${STABILITY_API_KEY:}"
+    # sensible defaults
+    durationSec: 30
+    outputFormat: "wav"  # wav | mp3
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,info

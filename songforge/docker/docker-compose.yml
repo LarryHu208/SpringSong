@@ -1,0 +1,33 @@
+services:
+  postgres:
+    image: postgres:16
+    container_name: songforge-postgres
+    restart: unless-stopped
+    environment:
+      POSTGRES_DB: songforge
+      POSTGRES_USER: songforge
+      POSTGRES_PASSWORD: songforge
+      PGDATA: /var/lib/postgresql/data/pgdata
+    ports:
+      - "5432:5432"
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+      # auto-run *.sql in this folder at first boot
+      - ./db/init:/docker-entrypoint-initdb.d:ro
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U songforge -d songforge"]
+      interval: 5s
+      timeout: 3s
+      retries: 10
+
+  adminer:
+    image: adminer:latest
+    container_name: songforge-adminer
+    restart: unless-stopped
+    ports:
+      - "8081:8080"  # browse http://localhost:8081
+    depends_on:
+      - postgres
+
+volumes:
+  pgdata:
