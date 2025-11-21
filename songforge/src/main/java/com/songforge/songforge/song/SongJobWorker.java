@@ -1,10 +1,9 @@
 package com.songforge.songforge.song;
 
 import org.springframework.scheduling.annotation.Scheduled;
-import org.springframework.stereotype.Component;
-import org.springframework.transaction.annotation.Transactional;
+import org.springframework.stereotype.Service;
 
-@Component
+@Service
 public class SongJobWorker {
 
     private final SongJobService service;
@@ -13,8 +12,7 @@ public class SongJobWorker {
         this.service = service;
     }
 
-    @Scheduled(fixedDelay = 1500)
-    @Transactional
+    @Scheduled(fixedDelayString = "${app.jobs.pollDelayMs:1000}")
     public void tick() {
         service.runOneIfQueued();
     }

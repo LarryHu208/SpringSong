@@ -36,6 +36,25 @@ public class SongController {
         return SongJobDto.from(service.enqueue(req.prompt(), req.style()));
     }
 
+    @PostMapping
+    public SongJobDto create(
+            @RequestBody CreateSongRequest req,
+            @RequestHeader(value = "Idempotency-Key", required = false) String key
+    ) {
+        return SongJobDto.from(service.enqueue(req.prompt(), req.style(), key));
+    }
+
+
+    @GetMapping
+    public List<SongJobDto> list(@RequestParam(required = false) String status) {
+        var jobs = (status == null)
+                ? service.listAll()
+                : service.listByStatus(status);
+
+        return jobs.stream().map(SongJobDto::from).toList();
+    }
+
+
     @GetMapping("/{id}")
     public SongJobDto get(@PathVariable UUID id) {
         return SongJobDto.from(service.get(id));

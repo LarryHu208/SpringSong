@@ -24,6 +24,9 @@ public class SongJob {
     @Column(nullable = false)
     private String status; // QUEUED|RUNNING|READY|FAILED|PUBLISHED
 
+    @Column(unique = true)
+    private String idempotencyKey;
+
     private String audioPath;    // e.g., songs/{id}.wav
     private String audioFormat;  // "wav"
     @Column(length = 2000)

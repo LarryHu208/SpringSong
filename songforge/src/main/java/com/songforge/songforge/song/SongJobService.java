@@ -48,6 +48,27 @@ public class SongJobService {
     }
 
     @Transactional
+    public SongJob enqueue(String prompt, String style, String idempotencyKey) {
+
+        if (idempotencyKey != null && !idempotencyKey.isBlank()) {
+            var existing = repo.findByIdempotencyKey(idempotencyKey);
+            if (existing.isPresent()) {
+                return existing.get(); // return existing job instead of creating duplicate
+            }
+        }
+
+        SongJob j = new SongJob();
+        j.setId(UUID.randomUUID());
+        j.setPrompt(prompt);
+        j.setStyle(style);
+        j.setStatus("QUEUED");
+        j.setIdempotencyKey(idempotencyKey);
+
+        return repo.save(j);
+    }
+
+
+    @Transactional
     public void runOneIfQueued() {
         var opt = repo.findFirstByStatusOrderByCreatedAtAsc("QUEUED");
         if (opt.isEmpty()) return;
@@ -75,5 +96,15 @@ public class SongJobService {
             job.setError(e.getMessage());
             repo.save(job);
         }
+    }
+
+    @Transactional(readOnly = true)
+    public List<SongJob> listAll() {
+        return repo.findAllByOrderByCreatedAtDesc();
+    }
+
+    @Transactional(readOnly = true)
+    public List<SongJob> listByStatus(String status) {
+        return repo.findByStatusOrderByCreatedAtDesc(status);
     }
 }

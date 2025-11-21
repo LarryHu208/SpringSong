@@ -7,4 +7,10 @@ import java.util.UUID;
 
 public interface SongJobRepository extends JpaRepository<SongJob, UUID> {
     Optional<SongJob> findFirstByStatusOrderByCreatedAtAsc(String status);
+
+    List<SongJob> findAllByOrderByCreatedAtDesc();
+
+    List<SongJob> findByStatusOrderByCreatedAtDesc(String status);
+
+    Optional<SongJob> findByIdempotencyKey(String key);
 }
